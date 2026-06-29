@@ -1,189 +1,253 @@
 """
-生成 kaka 个人信息轮播 GIF（3 页，自动循环）
+kaka 个人信息轮播 GIF — 基于 real profile 数据重新生成
+3 页自动循环，每页停留 5 秒
 
-页面1：基础信息（location, status, passion, fun_fact）- 标题 "Would you like me"
-页面2：学习态度 & 方向
-页面3：爱好 & 喜欢问什么 & 浏览偏好
+页面1：我是谁（基础身份）
+页面2：技术栈（核心能力）
+页面3：项目亮点 & 特质
 
-输出：kaka-carousel.gif（500 x 300）
+输出：kaka-carousel.gif
 """
 
 from PIL import Image, ImageDraw, ImageFont
-import math, os, textwrap
+import os, textwrap
 
-# ── 配置 ──────────────────────────────────────────
-W, H = 500, 300           # GIF 尺寸
-FPS = 0.25                 # 每页停留 4 秒（0.25 帧/秒）
-FRAMES_PER_PAGE = 1       # 每页只有 1 帧（纯静态，无过渡动画的实际帧）
-DURATION = 4000           # 每帧显示 4000ms
+# ── 配置 ────────────────────────────────────────
+W, H = 520, 380          # 加高防文字溢出
+DURATION = 5000           # 每页停 5 秒
 
-# GitHub Dark 配色
-BG_TOP = (0x0D, 0x11, 0x17)
-BG_BOT = (0x16, 0x1B, 0x22)
-BORDER = (0x30, 0x36, 0x3D)
-HEADER_BG = (0x1F, 0x6F, 0xEB, 25)  # 带 alpha
-BLUE = (0x58, 0xA6, 0xFF)
-LIGHT_BLUE = (0x79, 0xC0, 0xFF)
-GREEN = (0x3F, 0xB9, 0x50)
-PINK = (0xF7, 0x78, 0xBA)
-YELLOW = (0xF0, 0xD0, 0x60)
-PURPLE = (0xD2, 0xA8, 0xFF)
-ORANGE = (0xFF, 0xA6, 0x57)
-TEXT_DIM = (0x8B, 0x94, 0x9E)
-VALUE_TEXT = (0xA5, 0xD6, 0xFF)
-WHITE = (0xE6, 0xED, 0xF3)
+# ── 配色（GitHub Dark） ──────────────────────────
+BG_TOP    = (0x0D, 0x11, 0x17)
+BG_BOT    = (0x16, 0x1B, 0x22)
+BORDER    = (0x30, 0x36, 0x3D)
+BLUE      = (0x58, 0xA6, 0xFF)
+LIGHT_BL  = (0x79, 0xC0, 0xFF)
+GREEN     = (0x3F, 0xB9, 0x50)
+PINK      = (0xF7, 0x78, 0xBA)
+YELLOW    = (0xE0, 0xB0, 0x50)
+PURPLE    = (0xBB, 0x9A, 0xF7)
+ORANGE    = (0xFF, 0xA6, 0x57)
+CYAN      = (0x7D, 0xC2, 0xFF)
+DIM       = (0x6E, 0x76, 0x8E)
+VAL       = (0xC0, 0xCA, 0xF5)
+WHITE     = (0xE6, 0xED, 0xF3)
 
-# ── 字体 ──────────────────────────────────────────
-# Windows 自带字体
-FONT_PATH = "C:/Windows/Fonts/msyh.ttc"       # 微软雅黑（中文）
+# ── 字体 ─────────────────────────────────────────
+FP = "C:/Windows/Fonts/msyh.ttc"
 try:
-    font_14 = ImageFont.truetype(FONT_PATH, 14)
-    font_13 = ImageFont.truetype(FONT_PATH, 13)
-    font_12 = ImageFont.truetype(FONT_PATH, 12)
-    font_11 = ImageFont.truetype(FONT_PATH, 11)
-    font_10 = ImageFont.truetype(FONT_PATH, 10)
-    font_bold_14 = ImageFont.truetype(FONT_PATH, 14)
-    font_bold_12 = ImageFont.truetype(FONT_PATH, 12)
-except:
-    font_14 = ImageFont.load_default()
-    font_13 = font_14
-    font_12 = font_14
-    font_11 = font_14
-    font_10 = font_14
-    font_bold_14 = font_14
-    font_bold_12 = font_14
+    f14b = ImageFont.truetype(FP, 15)   # 粗体标题
+    f13  = ImageFont.truetype(FP, 13)   # 正常
+    f12  = ImageFont.truetype(FP, 12)   # 小字
+    f11  = ImageFont.truetype(FP, 11)   # 更小
+except Exception:
+    f14b = f13 = f12 = f11 = ImageFont.load_default()
 
-# ── 绘制函数 ───────────────────────────────────────
-def draw_card(draw):
-    """绘制卡片背景和标题栏"""
-    # 背景（从顶到底的渐变，用 3 个矩形模拟）
+# ── 工具函数 ─────────────────────────────────────
+def wrap_text(text, font, max_width):
+    """返回按像素宽度折行的文本列表"""
+    lines = []
+    for raw_line in text.split('\n'):
+        if not raw_line.strip():
+            lines.append('')
+            continue
+        # 逐字符测量，在 max_width 处断行
+        current = ''
+        for ch in raw_line:
+            test = current + ch
+            bbox = draw_text_size(test, font)
+            if bbox[0] > max_width and current:
+                lines.append(current)
+                current = ch
+            else:
+                current = test
+        if current:
+            lines.append(current)
+    return lines or ['']
+
+def draw_text_size(text, font):
+    """返回文本的 (宽, 高)"""
+    bbox = font.getbbox(text)
+    return (bbox[2] - bbox[0], bbox[3] - bbox[1])
+
+def draw_multiline(draw, x, y, lines, font, color, line_h=20):
+    """绘制多行文字，返回下一行 y 坐标"""
+    cy = y
+    for line in lines:
+        if line:
+            draw.text((x, cy), line, fill=color, font=font)
+        cy += line_h
+    return cy
+
+# ── 背景绘制 ─────────────────────────────────────
+def draw_bg(draw):
+    """渐变背景 + 圆角边框 + 标题栏"""
+    # 渐变填充
     for i in range(H):
         t = i / H
         r = int(BG_TOP[0] + (BG_BOT[0] - BG_TOP[0]) * t)
         g = int(BG_TOP[1] + (BG_BOT[1] - BG_TOP[1]) * t)
         b = int(BG_TOP[2] + (BG_BOT[2] - BG_TOP[2]) * t)
-        draw.line([(12, i), (W - 12, i)], fill=(r, g, b))
+        draw.line([(10, i), (W-10, i)], fill=(r,g,b))
 
-    # 圆角矩形边框
-    draw.rounded_rectangle([10, 10, W - 10, H - 10], radius=12, outline=BORDER, width=2)
+    # 边框
+    draw.rounded_rectangle([8, 8, W-8, H-8], radius=14, outline=BORDER, width=2)
 
-    # 标题栏
-    draw.rounded_rectangle([10, 10, W - 10, 54], radius=12, fill=HEADER_BG)
+    # 标题栏底色
+    draw.rounded_rectangle([8, 8, W-8, 52], radius=14, fill=(0x1F,0x6F,0xEB,30))
 
     # 标题文字
-    bbox = draw.textbbox((0, 0), "Would you like me", font=font_bold_14)
-    tw = bbox[2] - bbox[0]
-    draw.text(((W - tw) / 2, 35), "Would you like me", fill=BLUE, font=font_bold_14)
+    title = "Would you like me"
+    tw = draw_text_size(title, f14b)[0]
+    draw.text(((W-tw)/2, 33), title, fill=BLUE, font=f14b)
 
-    # 页面指示箭头 (◀ 1/3 ▶)
-    draw.text((30, H - 35), "◀", fill=TEXT_DIM, font=font_13)
-    draw.text((W - 50, H - 35), "▶", fill=TEXT_DIM, font=font_13)
-
-def draw_pagination(draw, current, total):
-    """绘制分页圆点"""
+def draw_dots(draw, cur, total):
+    """底部圆点分页指示器"""
+    gap = 16
+    total_w = (total - 1) * gap
+    sx = (W - total_w) // 2
+    cy = H - 28
     for i in range(total):
-        cx = W // 2 + (i - 1) * 18
-        cy = H - 30
-        r = 5
-        color = BLUE if i == current else BORDER
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
+        cx = sx + i * gap
+        r = 5 if i == cur else 4
+        c = BLUE if i == cur else DIM
+        draw.ellipse([cx-r, cy-r, cx+r, cy+r], fill=c)
+    # 页码
+    pt = f"{cur+1}/{total}"
+    pw = draw_text_size(pt, f11)[0]
+    draw.text(((W-pw)/2, H-18), pt, fill=DIM, font=f11)
 
-    # 页码文字
-    page_text = f"{current + 1} / {total}"
-    bbox = draw.textbbox((0, 0), page_text, font=font_10)
-    pw = bbox[2] - bbox[0]
-    draw.text(((W - pw) / 2, H - 18), page_text, fill=TEXT_DIM, font=font_10)
 
-def draw_page1(draw):
-    """第1页：基础信息"""
-    y_start = 75
-    items = [
-        ("location", "四川 · 宜宾", BLUE, VALUE_TEXT),
-        ("status",   "刚入社会",     BLUE, GREEN),
-        ("passion",  "自动化脚本 | Python | GitHub", BLUE, VALUE_TEXT),
-        ("fun_fact", "能用脚本搞定的事，绝不手动点两次", BLUE, VALUE_TEXT),
+# ═════════════ 页面定义 ══════════════
+
+def page_whoami(draw):
+    """Page 1: 我是谁"""
+    y = 68
+
+    # section: 基本信息
+    draw.text((35, y), "▸ 身份", fill=PINK, font=f14b);  y += 26
+    rows = [
+        ("location",  "四川 ·宜宾",         BLUE),
+        ("status",    "嵌入式云平台 / 自动化开发者", GREEN),
+        ("passion",   "Python · API逆向 · Serverless", VAL),
+        ("fun_fact",  "能用脚本搞定的，绝不手动点两次", YELLOW),
     ]
-    for i, (label, value, lbl_color, val_color) in enumerate(items):
-        y = y_start + i * 42
-        # 标签
-        draw.text((50, y), label, fill=lbl_color, font=font_bold_12)
-        # 冒号
-        draw.text((155, y), ":", fill=TEXT_DIM, font=font_12)
-        # 值
-        draw.text((170, y), value, fill=val_color, font=font_12)
+    for lbl, val, vc in rows:
+        lw = draw_text_size(lbl, f13)[0]
+        draw.text((48, y), lbl, fill=BLUE, font=f13)
+        draw.text((48 + lw + 6, y), ":", fill=DIM, font=f13)
+        draw.text((62 + lw + 6, y), val, fill=vc, font=f13)
+        y += 24
 
-def draw_page2(draw):
-    """第2页：学习态度 & 方向"""
-    draw.text((45, 75), "· 学习态度", fill=PINK, font=font_bold_14)
+    y += 8
+    # section: 一句话定位
+    draw.line([(35, y), (W-35, y)], fill=BORDER, width=1);  y += 12
+    bio_lines = wrap_text(
+        "热爱通过技术解决实际问题。从自动化签到到边缘计算部署，"
+        "从API逆向到AI验证码识别——能用代码搞定的事，绝不手动点两次。",
+        f12, W - 80
+    )
+    draw_multiline(draw, 40, y, bio_lines, f12, DIM, 20)
 
-    attitudes = [
-        "能用代码解决的，绝不用鼠标点",
-        "遇到问题先查文档，再 Google，最后问 AI",
-        "喜欢折腾，不怕报错，只怕不报错",
+
+def page_tech(draw):
+    """Page 2: 技术栈"""
+    y = 68
+
+    sections = [
+        ("▸ 编程语言", PINK, [
+            "Python  ——  自动化、爬虫、数据处理、脚本开发",
+            "TypeScript / JS  ——  前端交互、Node.js",
+            "HTML / CSS",
+        ]),
+        ("▸ 核心能力", CYAN, [
+            "HTTP 协议分析 · API 接口逆向 · 加密参数破解",
+            "AI 验证码识别（孪生网络 Siamese Network）",
+            "Cloudflare Workers / KV 边缘计算",
+            "VLESS / Trojan 代理协议 · Clash 订阅转换",
+        ]),
+        ("▸ 工程化", GREEN, [
+            "Git 版本控制 · GitHub Actions CI/CD",
+            "PyArmor 代码混淆 · PowerShell / Linux 部署",
+            "Jekyll 博客 · PWA 离线支持",
+        ]),
     ]
-    for i, text in enumerate(attitudes):
-        draw.text((60, 105 + i * 28), "· " + text, fill=VALUE_TEXT, font=font_12)
+    for title, tc, items in sections:
+        draw.text((35, y), title, fill=tc, font=f14b);  y += 24
+        for item in items:
+            lines = wrap_text("· " + item, f12, W - 75)
+            y = draw_multiline(draw, 45, y, lines, f12, VAL, 19)
+        y += 4
 
-    draw.text((45, 195), "· 学习方向", fill=PINK, font=font_bold_14)
-    directions = [
-        "Python 自动化 & 爬虫",
-        "GitHub Actions & DevOps",
+
+def page_projects(draw):
+    """Page 3: 项目 & 特质"""
+    y = 66
+
+    # projects
+    draw.text((35, y), "▸ 核心项目", fill=PURPLE, font=f14b);  y += 24
+
+    proj_title = ["★  高可用自动化签到系统"]
+    y = draw_multiline(draw, 42, y, proj_title, f12, ORANGE, 19)
+    proj_desc = wrap_text(
+        "独立开发增强版签到工具。突破环境检测限制，"
+        "引入孪生网络 AI 识别复杂验证码，CI/CD 云端定时触发实现 7×24h 运行。",
+        f11, W - 78
+    )
+    y = draw_multiline(draw, 48, y, proj_desc, f11, DIM, 18);  y += 6
+
+    proj2_title = ["★  Cloudflare 边缘计算应用"]
+    y = draw_multiline(draw, 42, y, proj2_title, f12, ORANGE, 19)
+    proj2_desc = wrap_text(
+        "Workers 动态路由、API 代理转发、VLESS 订阅一键转 Clash/Singbox 格式。",
+        f11, W - 78
+    )
+    y = draw_multiline(draw, 48, y, proj2_desc, f11, DIM, 18);  y += 8
+
+    # strengths
+    draw.line([(35, y), (W-35, y)], fill=BORDER, width=1);  y += 10
+    draw.text((35, y), "▸ 个人特质", fill=YELLOW, font=f14b);  y += 22
+
+    traits = [
+        "极客精神：不局限于课本，主动研究开源源码攻克技术难点",
+        "产品+技术思维：需求对接 → 逻辑梳理 → 方案输出 → 代码交付",
+        "工程规范意识：代码混淆、CI/CD 流水线，超越同龄人交付标准",
     ]
-    for i, text in enumerate(directions):
-        draw.text((60, 225 + i * 28), "· " + text, fill=VALUE_TEXT, font=font_12)
+    for t in traits:
+        lines = wrap_text("· " + t, f11, W - 72)
+        y = draw_multiline(draw, 42, y, lines, f11, VAL, 18)
 
-def draw_page3(draw):
-    """第3页：爱好 & 提问 & 浏览"""
-    draw.text((45, 75), "· 爱好", fill=PURPLE, font=font_bold_14)
-    hobbies = [
-        "写脚本解放双手，把重复的事交给代码",
-        "折腾 GitHub 主页，研究各种花哨效果",
-    ]
-    for i, text in enumerate(hobbies):
-        draw.text((60, 105 + i * 28), "· " + text, fill=VALUE_TEXT, font=font_12)
 
-    draw.text((45, 170), "· 喜欢问", fill=PURPLE, font=font_bold_14)
-    questions = [
-        "「这个能不能用 Python 自动化？」",
-        "「GitHub 这个效果是怎么做的？」",
-    ]
-    for i, text in enumerate(questions):
-        draw.text((60, 200 + i * 28), "· " + text, fill=VALUE_TEXT, font=font_12)
+# ═════════════ 主程序 ══════════════
 
-    draw.text((45, 260), "· 浏览偏好", fill=PURPLE, font=font_bold_12)
-    draw.text((155, 260), "技术博客 | GitHub Trending | 开源工具", fill=VALUE_TEXT, font=font_12)
-
-# ── 主程序 ─────────────────────────────────────────
 def main():
-    out_path = os.path.join(os.path.dirname(__file__), "kaka-carousel.gif")
-
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kaka-carousel.gif")
+    pages = [page_whoami, page_tech, page_projects]
     frames = []
-    page_drawers = [draw_page1, draw_page2, draw_page3]
 
-    for page_idx, drawer in enumerate(page_drawers):
-        # 每页生成一帧
+    for idx, drawer in enumerate(pages):
         img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        draw_card(draw)
-        drawer(draw)
-        draw_pagination(draw, page_idx, len(page_drawers))
+        d = ImageDraw.Draw(img)
+        draw_bg(d)
+        drawer(d)
+        draw_dots(d, idx, len(pages))
 
-        # 转 RGB
-        frame = Image.new("RGB", (W, H), (13, 17, 23))
-        frame.paste(img, (0, 0), img)
+        frame = Image.new("RGB", (W, H), BG_TOP)
+        frame.paste(img, (0,0), img)
         frames.append(frame)
 
-    # 保存 GIF
     frames[0].save(
-        out_path,
+        out,
         save_all=True,
         append_images=frames[1:],
         duration=DURATION,
         loop=0,
         disposal=2,
     )
-    print(f"[OK] Generated: {out_path}")
-    print(f"     Size: {W}x{H}, Frames: {len(frames)}, Duration: {DURATION}ms, Loop: forever")
+
+    size_kb = os.path.getsize(out) / 1024
+    print(f"[OK] Generated: {out}")
+    print(f"     Size: {W}x{H}, Frames: {len(frames)}, "
+          f"{DURATION}ms/page, {size_kb:.0f}KB, Loop forever")
 
 if __name__ == "__main__":
     main()
