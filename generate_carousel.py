@@ -144,8 +144,8 @@ def page_whoami(draw):
     # section: 基本信息
     y = draw_section(draw, y, "👤", "身份", PINK)
     rows = [
-        ("location",  "老子蜀道山 🐼",         BLUE),
-        ("status",    "电子信息 · 电工 (in training)", GREEN),
+        ("location",  "老子蜀道山 🌶️",         BLUE),
+        ("status",    "伏特骇客", GREEN),
         ("passion",   "Python · API逆向 · Serverless", VAL),
         ("fun_fact",  "能用脚本搞定的，绝不手动点两次", YELLOW),
     ]
