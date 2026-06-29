@@ -144,8 +144,8 @@ def page_whoami(draw):
     # section: 基本信息
     y = draw_section(draw, y, "👤", "身份", PINK)
     rows = [
-        ("location",  "四川 ·宜宾",         BLUE),
-        ("status",    "嵌入式云平台 / 自动化开发者", GREEN),
+        ("location",  "老子蜀道山 🐼",         BLUE),
+        ("status",    "电子信息 · 电工 (in training)", GREEN),
         ("passion",   "Python · API逆向 · Serverless", VAL),
         ("fun_fact",  "能用脚本搞定的，绝不手动点两次", YELLOW),
     ]
@@ -160,8 +160,9 @@ def page_whoami(draw):
     # section: 一句话定位
     draw.line([(35, y), (W-35, y)], fill=BORDER, width=1);  y += 12
     bio_lines = wrap_text(
-        "热爱通过技术解决实际问题。从自动化签到到边缘计算部署，"
-        "从API逆向到AI验证码识别——能用代码搞定的事，绝不手动点两次。",
+        "电子信息专业，目前一枚正在进阶的电工 🫡 热爱用代码偷懒，"
+        "从自动化脚本到API逆向，从边缘计算到AI验证码识别——"
+        "能用脚本搞定的事，绝不手动点两次。",
         f12, W - 80
     )
     draw_multiline(draw, 40, y, bio_lines, f12, DIM, 20)
