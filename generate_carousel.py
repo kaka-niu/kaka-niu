@@ -1,7 +1,7 @@
 """
 生成 kaka 个人信息轮播 GIF（3 页，自动循环）
 
-页面1：基础信息（location, status, passion, fun_fact）
+页面1：基础信息（location, status, passion, fun_fact）- 标题 "Would you like me"
 页面2：学习态度 & 方向
 页面3：爱好 & 喜欢问什么 & 浏览偏好
 
@@ -71,9 +71,9 @@ def draw_card(draw):
     draw.rounded_rectangle([10, 10, W - 10, 54], radius=12, fill=HEADER_BG)
 
     # 标题文字
-    bbox = draw.textbbox((0, 0), "kaka.cfg", font=font_bold_14)
+    bbox = draw.textbbox((0, 0), "Would you like me", font=font_bold_14)
     tw = bbox[2] - bbox[0]
-    draw.text(((W - tw) / 2, 35), "kaka.cfg", fill=BLUE, font=font_bold_14)
+    draw.text(((W - tw) / 2, 35), "Would you like me", fill=BLUE, font=font_bold_14)
 
     # 页面指示箭头 (◀ 1/3 ▶)
     draw.text((30, H - 35), "◀", fill=TEXT_DIM, font=font_13)
