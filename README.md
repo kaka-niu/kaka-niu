@@ -4,6 +4,18 @@
 
 ---
 
+## 🐍 Contribution Snake
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake.svg" />
+    <img alt="snake" src="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake-dark.svg" />
+  </picture>
+</p>
+
+---
+
 ## 🧑‍💻 About Me
 
 <p align="center">
@@ -59,18 +71,6 @@
   <a href="https://github.com/kaka-niu">
     <img src="https://github-readme-activity-graph.vercel.app/graph?username=kaka-niu&theme=tokyo-night&hide_border=true" alt="activity graph" />
   </a>
-</p>
-
----
-
-## 🐍 Contribution Snake
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake.svg" />
-    <img alt="snake" src="https://raw.githubusercontent.com/kaka-niu/kaka-niu/output/github-contribution-grid-snake-dark.svg" />
-  </picture>
 </p>
 
 ---
