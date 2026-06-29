@@ -1,0 +1,37 @@
+name: 🤖 Auto Update Bio
+
+on:
+  # 每小时整点触发一次（UTC 时间，+8 就是北京时间每小时）
+  schedule:
+    - cron: "0 * * * *"
+
+  # 允许在 GitHub Actions 页面手动触发，方便调试
+  workflow_dispatch:
+
+jobs:
+  update-bio:
+    name: Update GitHub Bio
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 拉取仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 安装 Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: pip install requests
+
+      # 4. 运行脚本
+      #    GITHUB_TOKEN 从 Secrets 读取（Settings > Secrets > Actions > New secret）
+      #    secret 名称：GH_TOKEN（避免和内置的 GITHUB_TOKEN 冲突）
+      - name: Run update_bio.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: python update_bio.py

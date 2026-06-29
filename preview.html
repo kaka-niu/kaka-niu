@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub 主页美化方案 - kaka-niu</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+  }
+
+  /* ── 顶栏 ── */
+  .topbar {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-logo { font-size: 24px; }
+  .topbar-title { font-size: 15px; color: #8b949e; }
+  .topbar-title span { color: #58a6ff; font-weight: 600; }
+
+  /* ── 布局 ── */
+  .container { max-width: 1000px; margin: 0 auto; padding: 32px 20px; }
+  h2.section-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #f0f6fc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2.section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #30363d;
+    margin-left: 12px;
+  }
+
+  /* ── README 预览卡 ── */
+  .readme-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 40px;
+  }
+  .readme-header {
+    text-align: center;
+    padding: 20px 0 28px;
+    border-bottom: 1px solid #30363d;
+    margin-bottom: 24px;
+  }
+  .typing-demo {
+    font-family: "Fira Code", monospace;
+    font-size: 22px;
+    color: #58a6ff;
+    letter-spacing: 1px;
+    min-height: 32px;
+    display: inline-block;
+  }
+  .cursor { animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .code-block .kw { color: #ff7b72; }
+  .code-block .str { color: #a5d6ff; }
+  .code-block .var { color: #ffa657; }
+  .code-block .cmt { color: #8b949e; font-style: italic; }
+  .code-block .key { color: #79c0ff; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; justify-content: center; }
+  .badge {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .badge-python  { background: #1a3a5c; color: #79c0ff; border: 1px solid #1f6feb; }
+  .badge-js      { background: #3d2f00; color: #f0d060; border: 1px solid #7a5a00; }
+  .badge-actions { background: #0f2e5c; color: #58a6ff; border: 1px solid #1f6feb; }
+  .badge-linux   { background: #3a2e00; color: #ffa657; border: 1px solid #7a5c00; }
+  .badge-vscode  { background: #00204a; color: #58a6ff; border: 1px solid #1f6feb; }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .stat-card {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px 24px;
+    text-align: center;
+    flex: 1;
+    min-width: 160px;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; color: #58a6ff; }
+  .stat-card .lbl { font-size: 12px; color: #8b949e; margin-top: 4px; }
+
+  /* ── Bio 自动化展示 ── */
+  .bio-section { margin-bottom: 40px; }
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    margin: 20px 0;
+  }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #1f6feb, #388bfd44);
+  }
+  .tl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 0 12px 56px;
+    position: relative;
+  }
+  .tl-dot {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #1f6feb;
+    border: 3px solid #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+  }
+  .tl-dot.active { background: #3fb950; box-shadow: 0 0 10px #3fb95088; }
+  .tl-content {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    flex: 1;
+  }
+  .tl-time { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
+  .tl-bio  { font-size: 14px; color: #e6edf3; }
+  .tl-content.active-slot {
+    border-color: #3fb950;
+    background: #0d2318;
+  }
+  .tl-content.active-slot .tl-bio { color: #3fb950; }
+
+  /* ── 步骤卡 ── */
+  .steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+  .step-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 18px 22px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    background: #1f6feb22;
+    border: 2px solid #1f6feb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #58a6ff;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .step-body h3 { font-size: 15px; color: #f0f6fc; margin-bottom: 6px; }
+  .step-body p  { font-size: 13px; color: #8b949e; line-height: 1.6; }
+  .step-body code {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #79c0ff;
+    font-family: monospace;
+  }
+
+  /* ── 文件树 ── */
+  .filetree {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 2;
+    margin-bottom: 40px;
+  }
+  .filetree .dir  { color: #79c0ff; }
+  .filetree .file { color: #e6edf3; }
+  .filetree .note { color: #8b949e; margin-left: 8px; }
+
+  /* ── 时钟显示 ── */
+  .live-clock {
+    text-align: center;
+    padding: 20px;
+    background: #0d1117;
+    border: 1px dashed #30363d;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  .live-clock .time-big { font-size: 36px; font-weight: 700; color: #58a6ff; font-family: monospace; }
+  .live-clock .bio-now  { font-size: 15px; color: #3fb950; margin-top: 8px; }
+  .live-clock .bio-label { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">🐙</span>
+  <div class="topbar-title">GitHub 主页美化方案 · <span>kaka-niu</span></div>
+</div>
+
+<div class="container">
+
+  <!-- ─────────────── 方案 A：Profile README ─────────────── -->
+  <h2 class="section-title">✨ 方案 A — Profile README 预览</h2>
+  <div class="readme-card">
+
+    <div class="readme-header">
+      <div class="typing-demo" id="typing"></div><span class="cursor">|</span>
+      <p style="color:#8b949e;font-size:13px;margin-top:8px;">打字动效 · 由 readme-typing-svg 生成</p>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:14px;color:#8b949e;margin-bottom:8px;">📄 about me</div>
+      <div class="code-block">
+        <span class="var">kaka</span> = {<br>
+        &nbsp;&nbsp;<span class="key">"location"</span>: <span class="str">"四川 · 宜宾"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"status"</span>:   <span class="str">"刚入社会"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"passion"</span>:   [<span class="str">"自动化脚本"</span>, <span class="str">"Python"</span>, <span class="str">"折腾 GitHub"</span>],<br>
+        &nbsp;&nbsp;<span class="key">"fun_fact"</span>:  <span class="str">"能用脚本搞定的事，绝不手动点两次"</span><br>
+        }
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:14px;color:#8b949e;margin-bottom:8px;">🛠️ tech stack</div>
+      <div class="badges">
+        <span class="badge badge-python">🐍 Python</span>
+        <span class="badge badge-js">⚡ JavaScript</span>
+        <span class="badge badge-actions">🤖 GitHub Actions</span>
+        <span class="badge badge-linux">🐧 Linux</span>
+        <span class="badge badge-vscode">💙 VS Code</span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:14px;color:#8b949e;margin-bottom:12px;">📊 github stats（实际效果通过 API 动态生成）</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="num">🔥</div><div class="lbl">Streak Stats</div></div>
+        <div class="stat-card"><div class="num">📈</div><div class="lbl">Contributions</div></div>
+        <div class="stat-card"><div class="num">🏆</div><div class="lbl">Trophies</div></div>
+        <div class="stat-card"><div class="num">🐍</div><div class="lbl">Snake Graph</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─────────────── 方案 B：Bio 自动切换 ─────────────── -->
+  <h2 class="section-title">🤖 方案 B — Bio 自动化时间线</h2>
+  <div class="bio-section">
+
+    <div class="live-clock">
+      <div class="bio-label">当前北京时间</div>
+      <div class="time-big" id="clock">--:--:--</div>
+      <div class="bio-label" style="margin-top:12px;">你的 Bio 现在应该是</div>
+      <div class="bio-now" id="current-bio">计算中...</div>
+    </div>
+
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <!-- ─────────────── 部署步骤 ─────────────── -->
+  <h2 class="section-title">🚀 部署步骤</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>创建同名仓库</h3>
+        <p>在 GitHub 上创建一个仓库，仓库名必须和你的用户名完全一致：<code>kaka-niu/kaka-niu</code>，设为 Public，勾选「Initialize with README」。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>上传 README.md</h3>
+        <p>把 <code>README.md</code> 内容替换进这个仓库。保存后，主页顶部立刻显示内容。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>生成 Personal Access Token</h3>
+        <p>GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → New token。<br>
+        权限勾选：<code>user</code> → <strong>read and write</strong>。复制 token 备用。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>添加 Repository Secret</h3>
+        <p>在 <code>kaka-niu/kaka-niu</code> 仓库 → Settings → Secrets → Actions → New secret。<br>
+        名称：<code>GH_TOKEN</code>，值：粘贴上一步的 token。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>上传脚本和 Action 文件</h3>
+        <p>把 <code>update_bio.py</code> 放到仓库根目录，把 <code>.github/workflows/update-bio.yml</code> 放到对应目录。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h3>验证运行</h3>
+        <p>进入 Actions 选项卡，找到「Auto Update Bio」，点击「Run workflow」手动触发一次，确认成功后，每小时自动运行。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────── 文件清单 ─────────────── -->
+  <h2 class="section-title">📁 文件清单</h2>
+  <div class="filetree">
+    <span class="dir">kaka-niu/</span>  <span class="note">← 你的同名仓库</span><br>
+    &nbsp;├── <span class="file">README.md</span>  <span class="note">← Profile 主页内容（方案 A）</span><br>
+    &nbsp;├── <span class="file">update_bio.py</span>  <span class="note">← Bio 自动更新脚本（方案 B）</span><br>
+    &nbsp;└── <span class="dir">.github/workflows/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">update-bio.yml</span>  <span class="note">← 每小时自动触发</span>
+  </div>
+
+</div>
+
+<script>
+  // ── 打字机效果 ──
+  const lines = [
+    "Hi there, I'm kaka 👋",
+    "A Student & Code Tinkerer ⚡",
+    "Automation Enthusiast 🤖",
+    "Always Learning, Always Building 🔥"
+  ];
+  let li = 0, ci = 0, deleting = false, wait = 0;
+  const el = document.getElementById("typing");
+  function type() {
+    if (wait > 0) { wait--; setTimeout(type, 50); return; }
+    if (!deleting) {
+      el.textContent = lines[li].slice(0, ci + 1);
+      ci++;
+      if (ci === lines[li].length) { deleting = true; wait = 40; }
+      setTimeout(type, 80);
+    } else {
+      el.textContent = lines[li].slice(0, ci - 1);
+      ci--;
+      if (ci === 0) { deleting = false; li = (li + 1) % lines.length; wait = 5; }
+      setTimeout(type, 40);
+    }
+  }
+  type();
+
+  // ── 时钟 + Bio 时间线 ──
+  const schedule = [
+    { start: 6,  end: 11, label: "早晨 06:00–11:59", bio: "☀️ 早起写代码 | 🍳 早饭还没吃 | Python & 自动化" },
+    { start: 12, end: 17, label: "白天 12:00–17:59", bio: "💻 Coding... | ☕ Coffee Time | 🤖 搞自动化" },
+    { start: 18, end: 20, label: "傍晚 18:00–20:59", bio: "🌆 下班了 | 🎮 摸鱼时间 | 📚 学点新东西" },
+    { start: 21, end: 5,  label: "深夜 21:00–05:59", bio: "🌙 深夜码农 | 💤 困但睡不着 | 🔥 Bug 消灭中", wrap: true },
+  ];
+
+  function getCST() {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utc + 8 * 3600000);
+  }
+
+  function getCurrentSlot(h) {
+    for (const s of schedule) {
+      if (s.wrap) {
+        if (h >= s.start || h <= s.end) return s;
+      } else {
+        if (h >= s.start && h <= s.end) return s;
+      }
+    }
+    return schedule[0];
+  }
+
+  function renderTimeline() {
+    const tl = document.getElementById("timeline");
+    const h = getCST().getHours();
+    tl.innerHTML = schedule.map(s => {
+      const isActive = getCurrentSlot(h) === s;
+      return `<div class="tl-item">
+        <div class="tl-dot ${isActive ? 'active' : ''}"></div>
+        <div class="tl-content ${isActive ? 'active-slot' : ''}">
+          <div class="tl-time">${s.label}</div>
+          <div class="tl-bio">${s.bio}</div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  function tick() {
+    const now = getCST();
+    const h = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    document.getElementById("clock").textContent = `${h}:${m}:${s}`;
+    const slot = getCurrentSlot(now.getHours());
+    document.getElementById("current-bio").textContent = slot.bio;
+  }
+
+  renderTimeline();
+  tick();
+  setInterval(tick, 1000);
+  setInterval(renderTimeline, 60000);
+</script>
+</body>
+</html>
