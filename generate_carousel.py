@@ -95,6 +95,27 @@ def draw_bullet(draw, y, text, font, color):
     lines = wrap_text(text, font, W - 78)
     return draw_multiline(draw, 56, y, lines, font, color, 19)
 
+def draw_panda(draw, x, y, size=14):
+    """用 PIL 原生图形画一只迷你熊猫，不依赖 emoji 字体"""
+    s = size
+    # 熊猫耳朵（黑色半圆）
+    ear_r = s // 4
+    draw.ellipse([x - s//2 + 1, y - s//3 - ear_r//2, x - s//2 + 1 + ear_r*2, y - s//3 + ear_r//2], fill=(30,30,35))
+    draw.ellipse([x + s//2 - ear_r*2 - 1, y - s//3 - ear_r//2, x + s//2 - 1, y - s//3 + ear_r//2], fill=(30,30,35))
+    # 白色圆脸
+    face_r = s // 2
+    draw.ellipse([x - face_r, y - face_r//2, x + face_r, y + face_r + face_r//2], fill=WHITE)
+    # 黑眼圈（椭圆）
+    draw.ellipse([x - face_r + 2, y, x - face_r//2 + 4, y + s//3], fill=(25,25,28))
+    draw.ellipse([x + face_r//2 - 4, y, x + face_r - 2, y + s//3], fill=(25,25,28))
+    # 黑眼睛（小圆点）
+    draw.ellipse([x - face_r + 5, y + 3, x - face_r//2 + 6, y + 7], fill=(20,20,22))
+    draw.ellipse([x + face_r//2 - 5, y + 3, x + face_r - 6, y + 7], fill=(20,20,22))
+    # 小黑鼻子
+    draw.ellipse([x - 3, y + s//3 - 2, x + 3, y + s//3 + 4], fill=(25,25,28))
+    # 微笑弧线
+    draw.arc([x - 4, y + s//3, x + 4, y + s//3 + 7], start=200, end=-20, fill=(80,80,85), width=1)
+
 # ── 背景绘制 ─────────────────────────────────────
 def draw_bg(draw):
     """渐变背景 + 圆角边框 + 标题栏"""
@@ -144,23 +165,27 @@ def page_whoami(draw):
     # section: 基本信息
     y = draw_section(draw, y, "👤", "身份", PINK)
     rows = [
-        ("location",  "老子蜀道山 🌶️",         BLUE),
-        ("status",    "伏特骇客", GREEN),
-        ("passion",   "Python · API逆向 · Serverless", VAL),
-        ("fun_fact",  "能用脚本搞定的，绝不手动点两次", YELLOW),
+        ("location",  "老子蜀道山",         BLUE, True),   # True = 后面画熊猫
+        ("status",    "伏特骇客", GREEN, False),
+        ("passion",   "Python · API逆向 · Serverless", VAL, False),
+        ("fun_fact",  "能用脚本搞定的，绝不手动点两次", YELLOW, False),
     ]
-    for lbl, val, vc in rows:
+    for lbl, val, vc, has_icon in rows:
         lw = draw_text_size(lbl, f13)[0]
         draw.text((48, y), lbl, fill=BLUE, font=f13)
         draw.text((48 + lw + 6, y), ":", fill=DIM, font=f13)
-        draw.text((62 + lw + 6, y), val, fill=vc, font=f13)
+        vx = 62 + lw + 6
+        draw.text((vx, y), val, fill=vc, font=f13)
+        if has_icon:
+            vw = draw_text_size(val, f13)[0]
+            draw_panda(draw, vx + vw + 5, y + 1, size=14)
         y += 24
 
     y += 8
     # section: 一句话定位
     draw.line([(35, y), (W-35, y)], fill=BORDER, width=1);  y += 12
     bio_lines = wrap_text(
-        "电子信息专业，目前一枚正在进阶的电工 🫡 热爱用代码偷懒，"
+        "电子信息专业，目前一枚正在进阶的电工。热爱用代码偷懒，"
         "从自动化脚本到API逆向，从边缘计算到AI验证码识别——"
         "能用脚本搞定的事，绝不手动点两次。",
         f12, W - 80
