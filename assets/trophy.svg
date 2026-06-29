@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="256" viewBox="0 0 460 256">
+  <rect width="460" height="256" rx="8" fill="#1a1b27"/>
+  <text x="20" y="36" font-family="Arial,sans-serif" font-size="14" fill="#565f89">🏆 GitHub Trophies</text>
+  <line x1="20" y1="44" x2="440" y2="44" stroke="#565f89" stroke-opacity="0.3"/>
+  <text x="28" y="82" font-family="Arial,sans-serif" font-size="20" fill="#e3b341">★</text>
+  <text x="56" y="82" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Total Stars</text>
+  <text x="432" y="82" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">3</text>
+  <text x="28" y="118" font-family="Arial,sans-serif" font-size="20" fill="#9ece6a">●</text>
+  <text x="56" y="118" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Total Commits</text>
+  <text x="432" y="118" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">111</text>
+  <text x="28" y="154" font-family="Arial,sans-serif" font-size="20" fill="#7aa2f7">◎</text>
+  <text x="56" y="154" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Pull Requests</text>
+  <text x="432" y="154" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">1</text>
+  <text x="28" y="190" font-family="Arial,sans-serif" font-size="20" fill="#f7768e">○</text>
+  <text x="56" y="190" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Issues</text>
+  <text x="432" y="190" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">1</text>
+  <text x="28" y="226" font-family="Arial,sans-serif" font-size="20" fill="#bb9af7">◆</text>
+  <text x="56" y="226" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Contributions</text>
+  <text x="432" y="226" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">12</text>
+</svg>

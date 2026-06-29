@@ -28,10 +28,10 @@
 
 <p align="center">
   <a href="https://github.com/kaka-niu">
-    <img height="180em" src="https://github-readme-stats.vercel.app/api?username=kaka-niu&show_icons=true&theme=tokyonight&include_all_commits=true&count_private=true&hide_border=true" />
+    <img height="180em" src="assets/stats.svg" />
   </a>
   <a href="https://github.com/kaka-niu">
-    <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=kaka-niu&layout=compact&theme=tokyonight&hide_border=true" />
+    <img height="180em" src="assets/top-langs.svg" />
   </a>
 </p>
 
@@ -47,7 +47,7 @@
 
 <p align="center">
   <a href="https://github.com/kaka-niu">
-    <img src="https://github-profile-trophy.vercel.app/?username=kaka-niu&theme=tokyonight&no-frame=true&column=7&margin-w=4" alt="trophy" />
+    <img src="assets/trophy.svg" alt="trophy" />
   </a>
 </p>
 
