@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="320" viewBox="0 0 500 320">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+
+    <!-- 标题渐变 -->
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1f6feb"/>
+      <stop offset="100%" stop-color="#58a6ff"/>
+    </linearGradient>
+
+    <!-- 页面切换动画 -->
+    <style>
+      .page { opacity: 0; transition: opacity 0.5s ease; }
+      .page.active { opacity: 1; }
+
+      /* 指示点样式 */
+      .dot {
+        fill: #30363d;
+        cursor: pointer;
+        transition: fill 0.3s;
+      }
+      .dot:hover { fill: #58a6ff; }
+      .dot.active { fill: #58a6ff; }
+
+      /* 导航箭头 */
+      .nav-btn {
+        fill: #30363d;
+        cursor: pointer;
+        transition: fill 0.3s;
+      }
+      .nav-btn:hover { fill: #58a6ff; }
+
+      /* 文字样式 */
+      .title { font-family: 'Fira Code', monospace; font-size: 14px; font-weight: bold; fill: #58a6ff; }
+      .label { font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 600; }
+      .value { font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif; font-size: 12px; fill: #a5d6ff; }
+      .emoji { font-size: 16px; }
+      .colon { fill: #8b949e; }
+
+      /* 颜色定义 */
+      .c-blue { fill: #79c0ff; }
+      .c-green { fill: #3fb950; }
+      .c-pink { fill: #f778ba; }
+      .c-yellow { fill: #f0d060; }
+      .c-purple { fill: #d2a8ff; }
+      .c-orange { fill: #ffa657; }
+    </style>
+
+    <script type="text/javascript">
+      <![CDATA[
+        let currentPage = 0;
+        const totalPages = 3;
+
+        function showPage(n) {
+          // 隐藏所有页面
+          for (let i = 0; i < totalPages; i++) {
+            document.getElementById('page' + i).classList.remove('active');
+            document.getElementById('dot' + i).classList.remove('active');
+          }
+
+          // 处理循环
+          if (n >= totalPages) currentPage = 0;
+          else if (n < 0) currentPage = totalPages - 1;
+          else currentPage = n;
+
+          // 显示当前页
+          document.getElementById('page' + currentPage).classList.add('active');
+          document.getElementById('dot' + currentPage).classList.add('active');
+        }
+
+        function nextPage() { showPage(currentPage + 1); }
+        function prevPage() { showPage(currentPage - 1); }
+
+        // 自动轮播（每5秒）
+        setInterval(() => {
+          showPage(currentPage + 1);
+        }, 5000);
+
+        // 初始化第一页
+        document.addEventListener('DOMContentLoaded', function() {
+          showPage(0);
+        });
+      ]]>
+    </script>
+  </defs>
+
+  <!-- 背景卡片 -->
+  <rect x="10" y="10" width="480" height="300" rx="16" fill="url(#bgGrad)" stroke="#30363d" stroke-width="1.5"/>
+
+  <!-- 标题栏 -->
+  <rect x="10" y="10" width="480" height="44" rx="16" fill="url(#headerGrad)" opacity="0.1"/>
+  <text x="250" y="38" text-anchor="middle" class="title">👤 kaka.cfg</text>
+
+  <!-- ========== 第1页：个人信息 ========== -->
+  <g id="page0" class="page active">
+    <!-- 📍 location -->
+    <text x="45" y="90" class="emoji">📍</text>
+    <text x="75" y="90" class="label c-blue">location</text>
+    <text x="165" y="90" class="colon">:</text>
+    <text x="180" y="90" class="value">四川 · 宜宾</text>
+
+    <!-- 💼 status -->
+    <text x="45" y="130" class="emoji">💼</text>
+    <text x="75" y="130" class="label c-blue">status</text>
+    <text x="165" y="130" class="colon">:</text>
+    <text x="180" y="130" class="value" style="fill:#3fb950;">刚入社会</text>
+
+    <!-- 🔥 passion -->
+    <text x="45" y="170" class="emoji">🔥</text>
+    <text x="75" y="170" class="label c-blue">passion</text>
+    <text x="165" y="170" class="colon">:</text>
+    <text x="180" y="170" class="value">自动化脚本</text>
+    <text x="270" y="170" class="colon">|</text>
+    <text x="285" y="170" class="value">Python</text>
+    <text x="350" y="170" class="colon">|</text>
+    <text x="365" y="170" class="value">GitHub</text>
+
+    <!-- ⚡ fun_fact -->
+    <text x="45" y="210" class="emoji">⚡</text>
+    <text x="75" y="210" class="label c-blue">fun_fact</text>
+    <text x="165" y="210" class="colon">:</text>
+    <text x="180" y="210" class="value">能用脚本搞定的事，绝不手动点两次</text>
+  </g>
+
+  <!-- ========== 第2页：学习 ========== -->
+  <g id="page1" class="page">
+    <!-- 📚 学习态度 -->
+    <text x="45" y="85" class="emoji">📚</text>
+    <text x="75" y="85" class="label c-pink">学习态度</text>
+
+    <text x="60" y="115" class="value" style="font-size:11px;">• 能用代码解决的，绝不用鼠标点</text>
+    <text x="60" y="140" class="value" style="font-size:11px;">• 遇到问题先翻文档，再 Google，最后问 AI</text>
+    <text x="60" y="165" class="value" style="font-size:11px;">• 喜欢折腾，不怕报错，只怕不报错</text>
+
+    <!-- 🎯 学习方向 -->
+    <text x="45" y="200" class="emoji">🎯</text>
+    <text x="75" y="200" class="label c-pink">学习方向</text>
+
+    <text x="60" y="230" class="value" style="font-size:11px;">• Python 自动化 &amp; 爬虫</text>
+    <text x="60" y="255" class="value" style="font-size:11px;">• GitHub Actions &amp; DevOps</text>
+  </g>
+
+  <!-- ========== 第3页：爱好 ========== -->
+  <g id="page2" class="page">
+    <!-- ❤️ 爱好 -->
+    <text x="45" y="85" class="emoji">❤️</text>
+    <text x="75" y="85" class="label c-purple">爱好</text>
+
+    <text x="60" y="115" class="value" style="font-size:11px;">• 写脚本解放双手，把重复的事交给代码</text>
+    <text x="60" y="140" class="value" style="font-size:11px;">• 折腾 GitHub 主页，研究各种花哨效果</text>
+
+    <!-- ❓ 喜欢问什么 -->
+    <text x="45" y="175" class="emoji">❓</text>
+    <text x="75" y="175" class="label c-purple">喜欢问</text>
+
+    <text x="60" y="205" class="value" style="font-size:11px;">• "这个能不能用 Python 自动化？"</text>
+    <text x="60" y="230" class="value" style="font-size:11px;">• "GitHub 这个效果是怎么做的？"</text>
+
+    <!-- 🔍 浏览偏好 -->
+    <text x="45" y="265" class="emoji">🔍</text>
+    <text x="75" y="265" class="label c-purple">浏览偏好</text>
+
+    <text x="180" y="265" class="value" style="font-size:11px;">技术博客 · GitHub Trending · 开源工具</text>
+  </g>
+
+  <!-- ========== 导航 ========== -->
+  <!-- 左箭头 -->
+  <g onclick="prevPage()" class="nav-btn">
+    <polygon points="35,270 25,280 35,290" fill="inherit"/>
+  </g>
+
+  <!-- 右箭头 -->
+  <g onclick="nextPage()" class="nav-btn">
+    <polygon points="465,270 475,280 465,290" fill="inherit"/>
+  </g>
+
+  <!-- 指示点 -->
+  <circle id="dot0" cx="235" cy="280" r="5" class="dot active" onclick="showPage(0)"/>
+  <circle id="dot1" cx="250" cy="280" r="5" class="dot" onclick="showPage(1)"/>
+  <circle id="dot2" cx="265" cy="280" r="5" class="dot" onclick="showPage(2)"/>
+
+  <!-- 提示文字 -->
+  <text x="250" y="305" text-anchor="middle" fill="#8b949e" font-size="10" font-family="'Fira Code',monospace">点击箭头或圆点切换 / 5秒自动轮播</text>
+</svg>

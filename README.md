@@ -6,14 +6,9 @@
 
 ## 🧑‍💻 About Me
 
-```python
-kaka = {
-    "location":  "四川 · 宜宾",
-    "status":    "刚入社会",
-    "passion":   ["自动化脚本", "Python", "折腾 GitHub"],
-    "fun_fact":  "能用脚本搞定的事，绝不手动点两次"
-}
-```
+<p align="center">
+  <img src="kaka-carousel.gif" alt="kaka profile" width="500" />
+</p>
 
 ---
 
