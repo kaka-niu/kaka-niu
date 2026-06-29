@@ -34,13 +34,16 @@ WHITE     = (0xE6, 0xED, 0xF3)
 
 # ── 字体 ─────────────────────────────────────────
 FP = "C:/Windows/Fonts/msyh.ttc"
+FPE = "C:/Windows/Fonts/seguiemj.ttf"  # Emoji 专用字体
 try:
     f14b = ImageFont.truetype(FP, 15)   # 粗体标题
     f13  = ImageFont.truetype(FP, 13)   # 正常
     f12  = ImageFont.truetype(FP, 12)   # 小字
     f11  = ImageFont.truetype(FP, 11)   # 更小
+    femoji = ImageFont.truetype(FPE, 15)
 except Exception:
     f14b = f13 = f12 = f11 = ImageFont.load_default()
+    femoji = f14b
 
 # ── 工具函数 ─────────────────────────────────────
 def wrap_text(text, font, max_width):
@@ -78,6 +81,20 @@ def draw_multiline(draw, x, y, lines, font, color, line_h=20):
         cy += line_h
     return cy
 
+def draw_section(draw, y, emoji, text, color):
+    """绘制带 emoji 图标的章节标题（emoji 用专用字体），返回下一个 y"""
+    draw.text((35, y), emoji, fill=color, font=femoji)
+    draw.text((58, y), text, fill=color, font=f14b)
+    return y + 24
+
+def draw_bullet(draw, y, text, font, color):
+    """绘制带圆点 bullet 的行，返回下一行 y"""
+    # 画一个小圆点代替字符 ·
+    cx, cy = 46, y + (draw_text_size(text[0] if text else "A", font)[1]) // 2
+    draw.ellipse([cx-2, cy-2, cx+2, cy+2], fill=DIM)
+    lines = wrap_text(text, font, W - 78)
+    return draw_multiline(draw, 56, y, lines, font, color, 19)
+
 # ── 背景绘制 ─────────────────────────────────────
 def draw_bg(draw):
     """渐变背景 + 圆角边框 + 标题栏"""
@@ -95,10 +112,11 @@ def draw_bg(draw):
     # 标题栏底色
     draw.rounded_rectangle([8, 8, W-8, 52], radius=14, fill=(0x1F,0x6F,0xEB,30))
 
-    # 标题文字
+    # 标题文字（带 emoji）
     title = "Would you like me"
     tw = draw_text_size(title, f14b)[0]
-    draw.text(((W-tw)/2, 33), title, fill=BLUE, font=f14b)
+    draw.text(((W-tw)/2 - 22, 33), "👋", fill=BLUE, font=femoji)
+    draw.text(((W-tw)/2 + 4, 33), title, fill=BLUE, font=f14b)
 
 def draw_dots(draw, cur, total):
     """底部圆点分页指示器"""
@@ -124,7 +142,7 @@ def page_whoami(draw):
     y = 68
 
     # section: 基本信息
-    draw.text((35, y), "▸ 身份", fill=PINK, font=f14b);  y += 26
+    y = draw_section(draw, y, "👤", "身份", PINK)
     rows = [
         ("location",  "四川 ·宜宾",         BLUE),
         ("status",    "嵌入式云平台 / 自动化开发者", GREEN),
@@ -154,28 +172,27 @@ def page_tech(draw):
     y = 68
 
     sections = [
-        ("▸ 编程语言", PINK, [
+        ("💻", "编程语言", PINK, [
             "Python  ——  自动化、爬虫、数据处理、脚本开发",
             "TypeScript / JS  ——  前端交互、Node.js",
             "HTML / CSS",
         ]),
-        ("▸ 核心能力", CYAN, [
+        ("⚡", "核心能力", CYAN, [
             "HTTP 协议分析 · API 接口逆向 · 加密参数破解",
             "AI 验证码识别（孪生网络 Siamese Network）",
             "Cloudflare Workers / KV 边缘计算",
             "VLESS / Trojan 代理协议 · Clash 订阅转换",
         ]),
-        ("▸ 工程化", GREEN, [
+        ("🛠️", "工程化", GREEN, [
             "Git 版本控制 · GitHub Actions CI/CD",
             "PyArmor 代码混淆 · PowerShell / Linux 部署",
             "Jekyll 博客 · PWA 离线支持",
         ]),
     ]
-    for title, tc, items in sections:
-        draw.text((35, y), title, fill=tc, font=f14b);  y += 24
+    for emoji, title, tc, items in sections:
+        y = draw_section(draw, y, emoji, title, tc)
         for item in items:
-            lines = wrap_text("· " + item, f12, W - 75)
-            y = draw_multiline(draw, 45, y, lines, f12, VAL, 19)
+            y = draw_bullet(draw, y, item, f12, VAL)
         y += 4
 
 
@@ -184,7 +201,7 @@ def page_projects(draw):
     y = 66
 
     # projects
-    draw.text((35, y), "▸ 核心项目", fill=PURPLE, font=f14b);  y += 24
+    y = draw_section(draw, y, "🚀", "核心项目", PURPLE)
 
     proj_title = ["★  高可用自动化签到系统"]
     y = draw_multiline(draw, 42, y, proj_title, f12, ORANGE, 19)
@@ -205,7 +222,7 @@ def page_projects(draw):
 
     # strengths
     draw.line([(35, y), (W-35, y)], fill=BORDER, width=1);  y += 10
-    draw.text((35, y), "▸ 个人特质", fill=YELLOW, font=f14b);  y += 22
+    y = draw_section(draw, y, "✨", "个人特质", YELLOW)
 
     traits = [
         "极客精神：不局限于课本，主动研究开源源码攻克技术难点",
@@ -213,8 +230,7 @@ def page_projects(draw):
         "工程规范意识：代码混淆、CI/CD 流水线，超越同龄人交付标准",
     ]
     for t in traits:
-        lines = wrap_text("· " + t, f11, W - 72)
-        y = draw_multiline(draw, 42, y, lines, f11, VAL, 18)
+        y = draw_bullet(draw, y, t, f11, VAL)
 
 
 # ═════════════ 主程序 ══════════════
