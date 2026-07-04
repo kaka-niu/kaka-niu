@@ -4,7 +4,7 @@
   <line x1="20" y1="44" x2="440" y2="44" stroke="#565f89" stroke-opacity="0.3"/>
   <text x="28" y="82" font-family="Arial,sans-serif" font-size="20" fill="#e3b341">★</text>
   <text x="56" y="82" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Total Stars</text>
-  <text x="432" y="82" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">3</text>
+  <text x="432" y="82" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">4</text>
   <text x="28" y="118" font-family="Arial,sans-serif" font-size="20" fill="#9ece6a">●</text>
   <text x="56" y="118" font-family="Arial,sans-serif" font-size="14" fill="#38bdae">Total Commits</text>
   <text x="432" y="118" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#c0caf5" text-anchor="end">120</text>
